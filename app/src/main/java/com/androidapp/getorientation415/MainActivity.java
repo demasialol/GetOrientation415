@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        txtAzimuth = findViewById(R.id.txtAzimuth);
-        txtPitch = findViewById(R.id.txtPitch);
-        txtRoll = findViewById(R.id.txtRoll);
+       // txtAzimuth = findViewById(R.id.txtAzimuth);
+       // txtPitch = findViewById(R.id.txtPitch);
+        //txtRoll = findViewById(R.id.txtRoll);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -39,11 +39,13 @@ public class MainActivity extends AppCompatActivity {
 
                     case Sensor.TYPE_ACCELEROMETER:
 
-                        accValues = sensorEvent.values.clone(); break;
+                        accValues = sensorEvent.values.clone();
+                        break;
 
                     case Sensor.TYPE_MAGNETIC_FIELD:
 
-                        magValues = sensorEvent.values.clone(); break;
+                        magValues = sensorEvent.values.clone();
+                        break;
 
                 }
 
@@ -58,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
                     SensorManager.getRotationMatrix(R, I, accValues, magValues);
 
 
-
                     // 2) 회전행렬로부터 방향 얻기
 
                     float[] values = new float[3];
@@ -66,17 +67,15 @@ public class MainActivity extends AppCompatActivity {
                     SensorManager.getOrientation(R, values);
 
 
-
-                    if((int) radian2Degree(values[0]) == 180) {
+                    if ((int) radian2Degree(values[0]) == 180) {
 
                         Toast.makeText(MainActivity.this, "180", Toast.LENGTH_SHORT);
 
-                    } else if((int) radian2Degree(values[0]) == -180) {
+                    } else if ((int) radian2Degree(values[0]) == -180) {
 
                         Toast.makeText(MainActivity.this, "-180", Toast.LENGTH_SHORT);
 
                     }
-
 
 
                     txtAzimuth.setText("Azimuth: " + (int) radian2Degree(values[0]));
@@ -87,14 +86,28 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
+
             @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            }
         };
         sensorManager.registerListener(listener, magSensor, SensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(listener, accSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
     private float radian2Degree(float radian) {
-        return radian * 180 / (float)Math.PI;
+        return radian * 180 / (float) Math.PI;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(listener);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(listener, magSensor, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(listener, accSensor, SensorManager.SENSOR_DELAY_UI);
     }
 }
